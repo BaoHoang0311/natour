@@ -123,6 +123,8 @@ app.route('/api/v1/tours/:id')
     .delete(deleteTour)
 
 // ddddd
+// main
+// test
 // app.get('/api/v1/tours/:id/:x/:y', (req, res) => {
 //     console.log(req.params);
 //     res.send('ok')
