@@ -122,7 +122,7 @@ app.route('/api/v1/tours/:id')
     .patch(updateTour)
     .delete(deleteTour)
 
-// test
+// ddddd
 // app.get('/api/v1/tours/:id/:x/:y', (req, res) => {
 //     console.log(req.params);
 //     res.send('ok')
