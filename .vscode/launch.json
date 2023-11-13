@@ -7,11 +7,11 @@
         {
             "type": "node",
             "request": "launch",
-            "name": "Launch Program",
+            "name": "Launch server.js",
             "skipFiles": [
                 "<node_internals>/**"
             ],
-            "program": "${workspaceFolder}\\5-natour\\app.js"
+            "program": "${workspaceFolder}\\5-natour\\server.js"
         }
     ]
 }

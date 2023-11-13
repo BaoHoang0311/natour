@@ -1,111 +1,26 @@
-const fs = require('fs');
 const express = require('express');
-
+const morgan = require('morgan');
+const tourRouter = require('./routes/toursrRoute')
+const userRouter = require('./routes/userRoute')
 const app = express();
 
+// 1) Middleware
 app.use(express.json());
-// For parsing application/x-www-form-urlencoded
-app.use(express.urlencoded({ extended: true }));
 
-// app.get('/',(req,res)=>{
-//     res.status(404).json({
-//         message: "hello from the server side",
-//         app: "Natour"
-//     });
-// })
+app.use((req, res, next) => {
+    console.log("hello from the middleware");
+    next();
+})
 
-// app.post('/',(req,res)=>{
-//     console.log(req.body);
-//     res.send("hello");
-// })
+app.use((req, res, next) => {
+    req.abcTime = new Date().toISOString()
+    next();
+})
 
-const tours = JSON.parse(
-    fs.readFileSync(`${__dirname}/dev-data/data/tours-simple.json`)
-);
-
-const getAllTours = (req, res) => {
-    res.status(200).json({
-        status: 'success',
-        results: tours.length,
-        data: {
-            tours: tours,
-        },
-    });
-}
-
-const createTour = (req, res) => {
-    const data = req.body;
-    const newId = tours[tours.length - 1].id + 1;
-    const newTour = Object.assign({ id: newId, description: "test" }, data);
-    tours.push(newTour);
-    fs.writeFile('./dev-data/data/tours-simple.json', JSON.stringify(tours), (err, data) => {
-        res.status(201).json({
-            status: 'success',
-            data: {
-                tour: newTour,
-            }
-        });
-    })
-}
-
-const getTour = (req, res) => {
-    let id = req.params.id;
-    console.log(req.params.id);
-
-    if (id >= tours.length) {
-        return res.status(404).json({
-            status: 'fail',
-            message: 'Invalid'
-        })
-    }
-    const tour = tours.find(el => el.id === parseInt(id))
-    res.status(200).json({
-        status: 'success',
-        data: {
-            tour: tour,
-        }
-    });
-}
-
-const updateTour = (req, res) => {
-    let id = req.params.id;
-    console.log(req.body);
-
-    const tour = tours.find(el => el.id === parseInt(id));
-    if (!tour) {
-        return res.status(404).json({
-            status: 'fail',
-            message: 'Invalid'
-        })
-    }
-    tour.description = req.body.description;
-    console.log(tour);
-    return res.status(200).json({
-        status: 'fail',
-        data: {
-            tour
-        }
-    })
-}
-
-const deleteTour = (req, res) => {
-    let id = req.params.id;
-    console.log(id);
-
-    if (req.params.id * 1 > tours.length) {
-        return res.status(404).json({
-            status: 'fail',
-            message: 'Invalid ID',
-        })
-    }
-
-    res.status(204).json({
-        status: 'sucess',
-        data: null,
-    })
-}
+app.use(morgan('dev'))
 
 
+//! Tour
 // app.get('/api/v1/tours', getAllTours);
 // app.post('/api/v1/tours', createTour);
 
@@ -113,24 +28,23 @@ const deleteTour = (req, res) => {
 // app.patch('/api/v1/tours/:id', updateTour)
 // app.delete('/api/v1/tours/:id', deleteTour)
 
-app.route('/api/v1/tours')
-    .get(getAllTours)
-    .post(createTour)
+//! User
 
-app.route('/api/v1/tours/:id')
-    .get(getTour)
-    .patch(updateTour)
-    .delete(deleteTour)
 
-// ddddd
-// main
-// test
+//! 3) Router
+
+// Middleware
+
+app.use('/api/v1/tours', tourRouter)
+app.use('/api/v1/users',userRouter);
+
 // app.get('/api/v1/tours/:id/:x/:y', (req, res) => {
-//     console.log(req.params);
-//     res.send('ok')
+//     const {id, x, y} = req.params
+//     console.log(id,x,y);
+//     res.send('okkk')
 // })
-///
-const port = 3000;
-app.listen(port, () => {
-    console.log(`app running on port ${port}...`);
-});
+
+
+//! 4) Server
+
+module.exports = app;
